@@ -6,7 +6,7 @@ import { HiveBoard } from './HiveBoard';
 const HiveClient = Client({
   game: HiveGame,
   board: HiveBoard,
-  multiplayer: false, // For local testing
+  multiplayer: false,
 });
 
 export default function App() {

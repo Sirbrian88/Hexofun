@@ -1,12 +1,21 @@
 
 import React, { useState } from 'react';
-import { HexGrid, Layout, Hexagon, Text, GridGenerator } from 'react-hexgrid';
+
+// Math for drawing a Hexagon in SVG
+const hexPath = "M 8.66 5 L 0 10 L -8.66 5 L -8.66 -5 L 0 -10 L 8.66 -5 Z";
 
 export function HiveBoard({ ctx, G, moves }) {
   const [selectedPiece, setSelectedPiece] = useState(null);
 
-  const onHexClick = (event, hexagon) => {
-    const { q, r } = hexagon;
+  // Generate a basic 7x7 hex grid center
+  const grid = [];
+  for (let q = -3; q <= 3; q++) {
+    for (let r = Math.max(-3, -q - 3); r <= Math.min(3, -q + 3); r++) {
+      grid.push({ q, r });
+    }
+  }
+
+  const handleClick = (q, r) => {
     if (selectedPiece) {
       moves.placePiece(selectedPiece, q, r);
       setSelectedPiece(null);
@@ -16,11 +25,10 @@ export function HiveBoard({ ctx, G, moves }) {
   const playerID = ctx.currentPlayer;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#f0f0f0', minHeight: '100vh', padding: '20px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#f3f4f6', minHeight: '100vh', padding: '20px', fontFamily: 'sans-serif' }}>
       <h1>Hive - Player {playerID}'s Turn</h1>
       
       <div style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
-        <h3>Your Hand:</h3>
         {Object.entries(G.inventory[playerID]).map(([type, count]) => (
           <button 
             key={type} 
@@ -28,9 +36,9 @@ export function HiveBoard({ ctx, G, moves }) {
             onClick={() => setSelectedPiece(type)}
             style={{ 
               padding: '10px', 
-              border: selectedPiece === type ? '3px solid black' : '1px solid gray',
-              borderRadius: '8px',
-              backgroundColor: 'white'
+              border: selectedPiece === type ? '3px solid blue' : '1px solid gray',
+              backgroundColor: count === 0 ? '#ddd' : 'white',
+              borderRadius: '8px'
             }}
           >
             {type} ({count})
@@ -38,31 +46,24 @@ export function HiveBoard({ ctx, G, moves }) {
         ))}
       </div>
 
-      <HexGrid width={800} height={600} viewBox="-50 -50 100 100">
-        <Layout size={{ x: 10, y: 10 }} flat={false} spacing={1.1} origin={{ x: 0, y: 0 }}>
-          {/* Create a base grid to click on */}
-          {GridGenerator.hexagon(5).map((hex, i) => (
-            <Hexagon 
-              key={i} 
-              q={hex.q} 
-              r={hex.r} 
-              s={hex.s} 
-              onClick={(e, h) => onHexClick(e, h)}
-              style={{ fill: G.cells[`${hex.q},${hex.r}`] ? 'none' : '#e0e0e0', stroke: 'white' }}
-            />
-          ))}
-
-          {/* Render the actual pieces */}
-          {Object.entries(G.cells).map(([key, piece]) => {
-            const [q, r] = key.split(',').map(Number);
-            return (
-              <Hexagon key={key} q={q} r={r} s={-q-r} style={{ fill: piece.player === '0' ? '#333' : '#fff', stroke: 'orange' }}>
-                <Text style={{ fontSize: '3px', fill: piece.player === '0' ? 'white' : 'black' }}>{piece.type}</Text>
-              </Hexagon>
-            );
-          })}
-        </Layout>
-      </HexGrid>
+      <svg width="600" height="600" viewBox="-50 -50 100 100">
+        {grid.map(hex => {
+          const x = 10 * (Math.sqrt(3) * hex.q + Math.sqrt(3)/2 * hex.r);
+          const y = 10 * (3/2 * hex.r);
+          const piece = G.cells[`${hex.q},${hex.r}`];
+          
+          return (
+            <g key={`${hex.q},${hex.r}`} transform={`translate(${x}, ${y})`} onClick={() => handleClick(hex.q, hex.r)} style={{cursor: 'pointer'}}>
+              <path d={hexPath} fill={piece ? (piece.player === '0' ? '#333' : 'white') : '#e5e7eb'} stroke="#999" strokeWidth="0.5" />
+              {piece && (
+                <text textAnchor="middle" dy="1.5" fontSize="2.5" fill={piece.player === '0' ? 'white' : 'black'} fontWeight="bold">
+                  {piece.type.substring(0, 1)}
+                </text>
+              )}
+            </g>
+          );
+        })}
+      </svg>
     </div>
   );
 }
