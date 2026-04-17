@@ -13,7 +13,7 @@
     "react": "latest",
     "react-dom": "latest",
     "boardgame.io": "^0.50.2",
-    "react-hexgrid": "^1.4.2",
+    "react-hexgrid": "latest",
     "lucide-react": "latest"
   }
 }
