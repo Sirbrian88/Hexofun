@@ -5,15 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next start"
   },
   "dependencies": {
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "boardgame.io": "^0.50.2",
-    "react-hexgrid": "latest",
-    "lucide-react": "latest"
+    "boardgame.io": "latest",
+    "react-hexgrid-fixed": "latest"
   }
 }
