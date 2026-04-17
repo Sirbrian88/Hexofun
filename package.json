@@ -11,6 +11,7 @@
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "boardgame.io": "latest"
+    "boardgame.io": "latest",
+    "canvas-confetti": "^1.6.0"
   }
 }
